@@ -1,17 +1,46 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 export default function MoodCard({ mood, emoji, delay }) {
   const router = useRouter()
+  const cardRef = useRef(null)
+
+  useEffect(() => {
+    const $ = window.$
+    if (!$ || !cardRef.current) return
+
+    $(cardRef.current).on('click', function (e) {
+      const offset = $(this).offset()
+      const x = e.pageX - offset.left
+      const y = e.pageY - offset.top
+
+      const ripple = $('<span class="ripple"></span>').css({
+        left: x - 20,
+        top: y - 20,
+        width: 40,
+        height: 40,
+      })
+
+      $(this).append(ripple)
+
+      setTimeout(() => ripple.remove(), 600)
+    })
+
+    return () => {
+      if ($ && cardRef.current) $(cardRef.current).off('click')
+    }
+  }, [])
 
   function handleClick() {
-    router.push(`/results?mood=${mood}`)
+    setTimeout(() => router.push(`/results?mood=${mood}`), 300)
   }
 
   return (
     <div
-      className="glass fade-up cursor-pointer flex flex-col items-center justify-center gap-3 hover:scale-105 transition-all duration-300"
+      ref={cardRef}
+      className="glass fade-up mood-card-wrap cursor-pointer flex flex-col items-center justify-center gap-3 hover:scale-105 transition-all duration-300"
       onClick={handleClick}
       style={{
         animationDelay: `${delay}ms`,

@@ -2,16 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useUser } from '@clerk/nextjs'
 import { fetchAnimeById } from '../../lib/fetchAnime'
 
 export default function AnimeDetailPage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id
+  const { isSignedIn } = useUser()
 
   const [anime, setAnime] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [adding, setAdding] = useState(false)
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     async function loadAnime() {
@@ -27,6 +31,40 @@ export default function AnimeDetailPage() {
     }
     loadAnime()
   }, [id])
+
+  async function handleAddToWatchlist() {
+    if (!isSignedIn) {
+      router.push('/sign-in')
+      return
+    }
+
+    try {
+      setAdding(true)
+      const res = await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          malId: anime.mal_id,
+          title: anime.title,
+          image: anime.images?.jpg?.large_image_url,
+          score: anime.score,
+          episodes: anime.episodes,
+          synopsis: anime.synopsis,
+        })
+      })
+
+      const data = await res.json()
+      if (data.success) {
+        setAdded(true)
+      } else {
+        alert(data.error)
+      }
+    } catch (err) {
+      alert("Something went wrong.")
+    } finally {
+      setAdding(false)
+    }
+  }
 
   if (loading) return (
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -62,7 +100,6 @@ export default function AnimeDetailPage() {
       </button>
 
       <div className="fade-up" style={{ display: "flex", gap: "32px", flexWrap: "wrap" }}>
-
         <img
           src={anime.images?.jpg?.large_image_url}
           alt={anime.title}
@@ -118,22 +155,32 @@ export default function AnimeDetailPage() {
           </p>
 
           <button
+            onClick={handleAddToWatchlist}
+            disabled={adding || added}
             style={{
-              background: "linear-gradient(135deg, #7c3aed, #db2777)",
-              border: "none",
+              background: added
+                ? "rgba(16,185,129,0.3)"
+                : "linear-gradient(135deg, #7c3aed, #db2777)",
+              border: added ? "1px solid rgba(16,185,129,0.5)" : "none",
               color: "white",
               padding: "12px 28px",
               borderRadius: "24px",
-              cursor: "pointer",
+              cursor: adding || added ? "default" : "pointer",
               fontWeight: 600,
               fontSize: "0.95rem",
+              transition: "all 0.3s ease",
             }}
           >
-            + Add to Watchlist
+            {added ? "✓ Added to Watchlist" : adding ? "Adding..." : "+ Add to Watchlist"}
           </button>
+
+          {!isSignedIn && (
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", marginTop: "10px" }}>
+              Sign in to save anime to your watchlist
+            </p>
+          )}
         </div>
       </div>
-
     </main>
   )
 }

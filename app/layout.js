@@ -17,6 +17,10 @@ export default function RootLayout({ children }) {
           <div style={{ position: "relative", zIndex: 1 }}>
             {children}
           </div>
+          <script
+            src="https://code.jquery.com/jquery-3.7.1.min.js"
+            crossOrigin="anonymous"
+          />
         </body>
       </html>
     </ClerkProvider>
