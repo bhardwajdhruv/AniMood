@@ -99,12 +99,12 @@ export default function AnimeDetailPage() {
         ← Back
       </button>
 
-      <div className="fade-up" style={{ display: "flex", gap: "32px", flexWrap: "wrap" }}>
+      <div className="fade-up" style={{ display: "flex", gap: "32px", flexWrap: "wrap", justifyContent: "center" }}>
         <img
           src={anime.images?.jpg?.large_image_url}
           alt={anime.title}
           style={{
-            width: "220px",
+            width: "clamp(160px, 30vw, 220px)",
             borderRadius: "16px",
             objectFit: "cover",
             flexShrink: 0,

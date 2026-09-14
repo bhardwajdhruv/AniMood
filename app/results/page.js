@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AnimeCard from '../components/AnimeCard'
+import SkeletonCard from '../components/SkeletonCard'
 import { fetchAnimeByMood } from '../lib/fetchAnime'
 
 export default function ResultsPage() {
@@ -52,7 +53,7 @@ export default function ResultsPage() {
           ← Back
         </button>
 
-        <h1 style={{ fontSize: "2.4rem", fontWeight: 700, color: "white", marginBottom: "6px" }}>
+        <h1 style={{ fontSize: "clamp(1.6rem, 4vw, 2.4rem)", fontWeight: 700, color: "white", marginBottom: "6px" }}>
           {mood} mood
         </h1>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.95rem" }}>
@@ -60,29 +61,24 @@ export default function ResultsPage() {
         </p>
       </div>
 
-      {loading && (
-        <div style={{ textAlign: "center", color: "rgba(255,255,255,0.5)", marginTop: "80px" }}>
-          Fetching anime for you...
-        </div>
-      )}
-
       {error && (
         <div style={{ textAlign: "center", color: "#f87171", marginTop: "80px" }}>
           {error}
         </div>
       )}
 
-      {!loading && !error && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          gap: "16px",
-        }}>
-          {anime.map((item, index) => (
-            <AnimeCard key={item.mal_id} anime={item} index={index} />
-          ))}
-        </div>
-      )}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        gap: "16px",
+      }}>
+        {loading
+          ? Array(12).fill(0).map((_, i) => <SkeletonCard key={i} />)
+          : anime.map((item, index) => (
+              <AnimeCard key={item.mal_id} anime={item} index={index} />
+            ))
+        }
+      </div>
 
     </main>
   )

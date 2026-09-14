@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs'
+import Navbar from './components/Navbar'
 import "./globals.css"
 
 export const metadata = {
@@ -15,7 +16,10 @@ export default function RootLayout({ children }) {
           <div className="orb orb-2" />
           <div className="orb orb-3" />
           <div style={{ position: "relative", zIndex: 1 }}>
-            {children}
+            <Navbar />
+            <div style={{ paddingTop: "64px" }}>
+              {children}
+            </div>
           </div>
           <script
             src="https://code.jquery.com/jquery-3.7.1.min.js"
