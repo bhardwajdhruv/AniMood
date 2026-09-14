@@ -1,9 +1,10 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function WatchlistPage() {
+function WatchlistContent() {
   const router = useRouter()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -21,7 +22,6 @@ export default function WatchlistPage() {
     loadWatchlist()
   }, [])
 
-  // jQuery filter — runs after items load
   useEffect(() => {
     if (!loading && items.length > 0) {
       const $ = window.$
@@ -221,5 +221,17 @@ export default function WatchlistPage() {
         </div>
       )}
     </main>
+  )
+}
+
+export default function WatchlistPage() {
+  return (
+    <Suspense fallback={
+      <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)" }}>Loading watchlist...</p>
+      </main>
+    }>
+      <WatchlistContent />
+    </Suspense>
   )
 }

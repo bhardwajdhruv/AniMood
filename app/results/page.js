@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import AnimeCard from '../components/AnimeCard'
 import SkeletonCard from '../components/SkeletonCard'
 import { fetchAnimeByMood } from '../lib/fetchAnime'
 
-export default function ResultsPage() {
+function ResultsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mood = searchParams.get('mood') || 'Happy'
@@ -81,5 +82,24 @@ export default function ResultsPage() {
       </div>
 
     </main>
+  )
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <main style={{ minHeight: "100vh", padding: "40px 24px", maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+          gap: "16px",
+          marginTop: "80px"
+        }}>
+          {Array(12).fill(0).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      </main>
+    }>
+      <ResultsContent />
+    </Suspense>
   )
 }
